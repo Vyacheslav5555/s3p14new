@@ -1,0 +1,123 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// Базовый класс
+class Computer {
+protected:
+    string brand;
+    double price;
+
+public:
+    Computer(const string& brand, double price) : brand(brand), price(price) {}
+
+    virtual void displayInfo() const {
+        cout << "Brand: " << brand << ", Price: $" << price << endl;
+    }
+
+    virtual string getType() const = 0; // Чисто виртуальный метод для типа компьютера
+
+    double getPrice() const {
+        return price;
+    }
+
+    virtual ~Computer() = default;
+};
+
+// Класс "Настольный компьютер"
+class DesktopComputer : public Computer {
+public:
+    DesktopComputer(const string& brand, double price) : Computer(brand, price) {}
+
+    void displayInfo() const override {
+        cout << "Desktop Computer -> ";
+        Computer::displayInfo();
+    }
+
+    string getType() const override {
+        return "Desktop Computer";
+    }
+};
+
+// Класс "Ноутбук"
+class Laptop : public Computer {
+public:
+    Laptop(const string& brand, double price) : Computer(brand, price) {}
+
+    void displayInfo() const override {
+        cout << "Laptop -> ";
+        Computer::displayInfo();
+    }
+
+    string getType() const override {
+        return "Laptop";
+    }
+};
+
+// Функция для отображения меню
+void menu(vector<Computer*>& computers) {
+    while (true) {
+        cout << "\nМеню:\n";
+        cout << "1. Добавить настольный компьютер\n";
+        cout << "2. Добавить ноутбук\n";
+        cout << "3. Показать все компьютеры\n";
+        cout << "4. Показать среднюю цену компьютеров\n";
+        cout << "5. Выход\n";
+        cout << "Выберите действие: ";
+
+        int choice;
+        cin >> choice;
+
+        if (choice == 1) { // Добавить настольный компьютер
+            string brand;
+            double price;
+            cout << "Введите бренд настольного компьютера: ";
+            cin >> brand;
+            cout << "Введите цену: ";
+            cin >> price;
+            computers.push_back(new DesktopComputer(brand, price));
+            cout << "Настольный компьютер добавлен.\n";
+        } else if (choice == 2) { // Добавить ноутбук
+            string brand;
+            double price;
+            cout << "Введите бренд ноутбука: ";
+            cin >> brand;
+            cout << "Введите цену: ";
+            cin >> price;
+            computers.push_back(new Laptop(brand, price));
+            cout << "Ноутбук добавлен.\n";
+        } else if (choice == 3) { // Показать все компьютеры
+            cout << "Список компьютеров:\n";
+            for (const auto& computer : computers) {
+                computer->displayInfo();
+            }
+        } else if (choice == 4) { // Показать среднюю цену
+            double totalPrice = 0.0;
+            for (const auto& computer : computers) {
+                totalPrice += computer->getPrice();
+            }
+            double averagePrice = computers.empty() ? 0 : totalPrice / computers.size();
+            cout << "Средняя цена компьютеров: $" << averagePrice << endl;
+        } else if (choice == 5) { // Выход
+            cout << "Завершение программы.\n";
+            break;
+        } else {
+            cout << "Некорректный ввод. Попробуйте снова.\n";
+        }
+    }
+}
+
+int main() {
+    vector<Computer*> computers; // Вектор указателей на базовый класс
+
+    menu(computers);
+
+    // Очистка памяти
+    for (auto computer : computers) {
+        delete computer;
+    }
+
+    return 0;
+}
